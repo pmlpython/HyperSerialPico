@@ -70,11 +70,11 @@
 	#pragma message(VAR_NAME_VALUE(SPILED_APA102))
 #endif
 
-#ifdef NEOPIXEL_RGBW
-	#define LED_DRIVER sk6812
-#elif NEOPIXEL_RGB
-	#define LED_DRIVER ws2812
-#endif
+// #ifdef NEOPIXEL_RGBW
+// 	#define LED_DRIVER sk6812
+// #elif NEOPIXEL_RGB
+// 	#define LED_DRIVER ws2812
+// #endif
 
 #ifdef SPILED_APA102
 	#define LED_DRIVER apa102
@@ -86,30 +86,32 @@
 	#pragma message(VAR_NAME_VALUE(CLOCK_PIN))
 #endif
 
-#if defined(SECOND_SEGMENT_START_INDEX)
-	#pragma message("Using parallel mode for segments")
+#define LED_DRIVER sk6812
+#pragma message(VAR_NAME_VALUE(LED_DRIVER))
+// #if defined(SECOND_SEGMENT_START_INDEX)
+// 	#pragma message("Using parallel mode for segments")
 
-	#ifdef NEOPIXEL_RGBW
-			#undef LED_DRIVER
-			#define LED_DRIVER sk6812p
-			#define LED_DRIVER2 sk6812p
-	#elif NEOPIXEL_RGB
-			#undef LED_DRIVER
-			#define LED_DRIVER ws2812p
-			#define LED_DRIVER2 ws2812p
-	#else
-		#error "Parallel mode is unsupportd for selected LEDs configuration"
-	#endif
+// 	#ifdef NEOPIXEL_RGBW
+// 			#undef LED_DRIVER
+// 			#define LED_DRIVER sk6812p
+// 			#define LED_DRIVER2 sk6812p
+// 	#elif NEOPIXEL_RGB
+// 			#undef LED_DRIVER
+// 			#define LED_DRIVER ws2812p
+// 			#define LED_DRIVER2 ws2812p
+// 	#else
+// 		#error "Parallel mode is unsupportd for selected LEDs configuration"
+// 	#endif
 
-	#pragma message(VAR_NAME_VALUE(LED_DRIVER))
-	#pragma message(VAR_NAME_VALUE(SECOND_SEGMENT_START_INDEX))
-	#pragma message(VAR_NAME_VALUE(LED_DRIVER2))
-	#pragma message(VAR_NAME_VALUE(SECOND_SEGMENT_REVERSED))
-#else
-	#pragma message(VAR_NAME_VALUE(LED_DRIVER))
+// 	#pragma message(VAR_NAME_VALUE(LED_DRIVER))
+// 	#pragma message(VAR_NAME_VALUE(SECOND_SEGMENT_START_INDEX))
+// 	#pragma message(VAR_NAME_VALUE(LED_DRIVER2))
+// 	#pragma message(VAR_NAME_VALUE(SECOND_SEGMENT_REVERSED))
+// #else
+// 	#pragma message(VAR_NAME_VALUE(LED_DRIVER))
 
-	typedef LedDriver LED_DRIVER2;
-#endif
+// 	typedef LedDriver LED_DRIVER2;
+// #endif
 
 /////////////////////////////////////////////////////////////////////////
 #define delay(x) sleep_ms(x)

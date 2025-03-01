@@ -128,8 +128,8 @@ void processData()
 					frameState.setState(AwaProtocol::HEADER_A);
 				else
 				{
-					if (ledSize != base.getLedsNumber())
-						base.initLedStrip(ledSize);
+					if (ledSize != base.getLedCount())
+						base.initializeLedStrips();
 
 					frameState.setState(AwaProtocol::RED);
 				}

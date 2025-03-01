@@ -28,14 +28,17 @@
 #ifndef BASE_H
 #define BASE_H
 
+#include <vector>
+
 class Base
 {
 	// LED strip number
 	int ledsNumber = 0;
-	// NeoPixelBusLibrary primary object
-	LED_DRIVER* ledStrip1 = nullptr;
-	// NeoPixelBusLibrary second object
-	LED_DRIVER2* ledStrip2 = nullptr;
+
+	// Should I use sk6812p instead?
+	std::vector<LED_DRIVER*> ledStrips;
+	std::vector<int> ledCounts = {240, 129};
+
 	// frame is set and ready to render
 	bool readyToRender = false;
 
@@ -53,60 +56,50 @@ class Base
 		// queue end position
 		volatile int queueEnd = 0;
 
-		inline int getLedsNumber()
+		inline int getLedCount()
 		{
-			return ledsNumber;
-		}
-
-		inline LED_DRIVER* getLedStrip1()
-		{
-			return ledStrip1;
-		}
-
-		inline LED_DRIVER2* getLedStrip2()
-		{
-			return ledStrip2;
-		}
-
-		void initLedStrip(int count)
-		{
-			if (ledStrip1 != nullptr)
-			{
-				delete ledStrip1;
-				ledStrip1 = nullptr;
+			int sum = 0;
+			for (int ledCount : ledCounts) {
+				sum += ledCount;
 			}
+			return sum;
+		}
 
-			if (ledStrip2 != nullptr)
-			{
-				delete ledStrip2;
-				ledStrip2 = nullptr;
+		void initializeLedStrips()
+		{
+			for (LED_DRIVER* ledStrip : ledStrips) {
+				delete ledStrip;
 			}
+			ledStrips.clear();
 
-			ledsNumber = count;
+			for (int ledCount : ledCounts) {
+				LED_DRIVER* ledStrip = new LED_DRIVER(ledCount, DATA_PIN);
+				ledStrips.push_back(ledStrip);
+			}
+		}
 
-			#if defined(SECOND_SEGMENT_START_INDEX)
-				if (ledsNumber > SECOND_SEGMENT_START_INDEX)
-				{
-					#if defined(NEOPIXEL_RGBW) || defined(NEOPIXEL_RGB)
-						ledStrip1 = new LED_DRIVER(SECOND_SEGMENT_START_INDEX, DATA_PIN);
-						ledStrip2 = new LED_DRIVER2(ledsNumber - SECOND_SEGMENT_START_INDEX, DATA_PIN);
-					#else
-						ledStrip1 = new LED_DRIVER(SECOND_SEGMENT_START_INDEX);
-						ledStrip1->Begin(CLOCK_PIN, 12, DATA_PIN, 15);
-						ledStrip2 = new LED_DRIVER2(ledsNumber - SECOND_SEGMENT_START_INDEX);
-						ledStrip2->Begin(SECOND_SEGMENT_CLOCK_PIN, 12, SECOND_SEGMENT_DATA_PIN, 15);
-					#endif
+		inline int getLedStripCount()
+		{
+			return ledStrips.size();
+		}
+
+		inline LED_DRIVER* getLedStrip(int index)
+		{
+			if (index < 0 || index >= ledStrips.size()) {
+				return nullptr;
+			}
+			return ledStrips[index];
+		}
+
+		inline int getLedStripIndexByPixel(int pixelIndex) {
+			int sum = 0;
+			for (int i = 0; i < ledCounts.size(); i++) {
+				sum += ledCounts[i];
+				if (pixelIndex < sum) {
+					return i;
 				}
-			#endif
-
-			if (ledStrip1 == nullptr)
-			{
-				#if defined(NEOPIXEL_RGBW) || defined(NEOPIXEL_RGB)
-					ledStrip1 = new LED_DRIVER(ledsNumber, DATA_PIN);
-				#else
-					ledStrip1 = new LED_DRIVER(ledsNumber, SPI_INTERFACE, DATA_PIN, CLOCK_PIN);
-				#endif
 			}
+			return -1;
 		}
 
 		/**
@@ -130,42 +123,50 @@ class Base
 			if (newFrame)
 				readyToRender = true;
 
+			LED_DRIVER* firstLedStrip = getLedStrip(0);
+			
 			if (readyToRender &&
-				(ledStrip1 != nullptr && ledStrip1->isReadyBlocking()))
+				(firstLedStrip != nullptr && firstLedStrip->isReadyBlocking()))
 			{
 				statistics.increaseShow();
 				readyToRender = false;
 
-				// display segments
-				#if defined(SECOND_SEGMENT_START_INDEX)
-					ledStrip1->renderAllLanes();
-				#else
-					ledStrip1->renderSingleLane();
-				#endif
+				// if (getLedStripCount() > 1) {
+					// firstLedStrip->renderAllLanes();
+				// } else {
+				// 	// render only the first strip
+					firstLedStrip->renderSingleLane();
+				// }
 			}
 		}
 
-		inline bool setStripPixel(uint16_t pix, ColorDefinition &inputColor)
+		inline bool setStripPixel(uint16_t pixelIndex, ColorDefinition &inputColor)
 		{
-			if (pix < ledsNumber)
+			// return true if there is another pixel after this one
+
+			if (pixelIndex < getLedCount())
 			{
-				#if defined(SECOND_SEGMENT_START_INDEX)
-					if (pix < SECOND_SEGMENT_START_INDEX)
-						ledStrip1->SetPixel(pix, inputColor);
-					else
-					{
-						#if defined(SECOND_SEGMENT_REVERSED)
-							ledStrip2->SetPixel(ledsNumber - pix - 1, inputColor);
-						#else
-							ledStrip2->SetPixel(pix - SECOND_SEGMENT_START_INDEX, inputColor);
-						#endif
-					}
-				#else
-					ledStrip1->SetPixel(pix, inputColor);
-				#endif
+				// figure out which strip it's in
+				int stripIndex = getLedStripIndexByPixel(pixelIndex);
+				if (stripIndex < 0) {
+					return false;
+				}
+
+				LED_DRIVER* ledStrip = getLedStrip(stripIndex);
+				if (ledStrip == nullptr) {
+					return false;
+				}
+
+				// set the pixel
+				ledStrip->SetPixel(pixelIndex - ledCounts[stripIndex], inputColor);
+
+				// FIXME: Reverse
+				// #if defined(SECOND_SEGMENT_REVERSED)
+				// ledStrip2->SetPixel(ledsNumber - pixelIndex - 1, inputColor);
 			}
 
-			return (pix + 1 < ledsNumber);
+			// return true if the pixel is not the last one
+			return (pixelIndex + 1 < getLedCount());
 		}
 } base;
 

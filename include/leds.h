@@ -569,8 +569,8 @@ volatile bool DmaClient::isDmaBusy = false;
 
 
 // API classes
-typedef NeopixelType<NeopixelSubtype::ws2812b, 650, ColorGrb32> ws2812;
-typedef NeopixelType<NeopixelSubtype::sk6812, 450, ColorGrbw> sk6812;
-typedef NeopixelParallelType<NeopixelSubtype::ws2812b, 300, ColorGrb> ws2812p;
-typedef NeopixelParallelType<NeopixelSubtype::sk6812, 80, ColorGrbw> sk6812p;
-typedef DotstarType<100, ColorDotstartBgr> apa102;
+// typedef NeopixelType<NeopixelSubtype::ws2812b, 650, ColorGrb32> ws2812;
+// typedef NeopixelType<NeopixelSubtype::sk6812, 450, ColorGrbw> sk6812; // Single
+// typedef NeopixelParallelType<NeopixelSubtype::ws2812b, 300, ColorGrb> ws2812p;
+typedef NeopixelParallelType<NeopixelSubtype::sk6812, 80, ColorGrbw> sk6812p; // Parallel
+// typedef DotstarType<100, ColorDotstartBgr> apa102;
