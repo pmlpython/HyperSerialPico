@@ -132,10 +132,10 @@ class Base
 				readyToRender = false;
 
 				// if (getLedStripCount() > 1) {
-					// firstLedStrip->renderAllLanes();
+					firstLedStrip->renderAllLanes();
 				// } else {
 				// 	// render only the first strip
-					firstLedStrip->renderSingleLane();
+					// firstLedStrip->renderSingleLane();
 				// }
 			}
 		}

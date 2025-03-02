@@ -86,7 +86,7 @@
 	#pragma message(VAR_NAME_VALUE(CLOCK_PIN))
 #endif
 
-#define LED_DRIVER sk6812
+#define LED_DRIVER sk6812p
 #pragma message(VAR_NAME_VALUE(LED_DRIVER))
 // #if defined(SECOND_SEGMENT_START_INDEX)
 // 	#pragma message("Using parallel mode for segments")
