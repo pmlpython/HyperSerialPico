@@ -37,7 +37,7 @@ class Base
 
 	// Should I use sk6812p instead?
 	std::vector<LED_DRIVER*> ledStrips;
-	std::vector<int> ledCounts = {240, 129};
+	std::vector<int> ledCounts = {315, 99, 105};
 
 	// frame is set and ready to render
 	bool readyToRender = false;
