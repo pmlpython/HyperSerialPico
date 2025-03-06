@@ -72,8 +72,8 @@ class Base
 			}
 			ledStrips.clear();
 
-			for (int i = 0; i < ledCounts.size(); i++) {
-				LED_DRIVER* ledStrip = new LED_DRIVER(ledCounts[i], DATA_PIN + i);
+			for (int ledCount : ledCounts) {
+				LED_DRIVER* ledStrip = new LED_DRIVER(ledCount, DATA_PIN);
 				ledStrips.push_back(ledStrip);
 			}
 		}
