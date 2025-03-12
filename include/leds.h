@@ -417,7 +417,9 @@ class NeopixelParallel
 	NeopixelParallel(NeopixelSubtype _type, size_t pixelSize, uint64_t _resetTime, int _ledsNumber, int _pin):
 					myLaneMask(1 << (instances++))
 	{
-		maxLeds = std::max(maxLeds, _ledsNumber);
+		int stripLEDCounts[] = {5, 7, 15};  // LED count per strip
+		maxLeds = stripLEDCounts[instances];  // Assign per segment
+
 
 		delete muxer;
 		muxer = new Neopixel(_type, instances, _resetTime, maxLeds, _pin, maxLeds * 8 * pixelSize );
@@ -461,7 +463,10 @@ class NeopixelParallelType : public NeopixelParallel
 
 	public:
 
-	NeopixelParallelType(int _ledsNumber, int _basePinForLanes) :
+	NeopixelParallelType(int _basePinForLanes)
+   		: NeopixelParallel(_type, sizeof(colorData), RESET_TIME,
+                       stripLEDCounts[instances], _basePinForLanes)
+
 		NeopixelParallel(_type, sizeof(colorData), RESET_TIME, _ledsNumber, _basePinForLanes)
 	{
 		for (uint8_t a = 0; a < 16; a++)
